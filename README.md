@@ -1,66 +1,141 @@
-# Document Summary Assistant
+# 📄 Document Summary Assistant  
 
-A minimal PDF/Image → Text → Summary web app for technical assessment.
+An AI-powered web application that takes **documents (PDFs & images)**, extracts text with **OCR / parsing**, and generates **smart summaries** along with **improvement suggestions**.  
 
-## Features
-- Upload **PDF** or **image** (`.png/.jpg/.jpeg`)
-- Extract text:
-  - PDFs via `pdfplumber`
-  - Images via **OCR** (`pytesseract`)
-- Summarize with Hugging Face Transformers (DistilBART, fallback to T5)
-- Choose summary length: **short**, **medium**, **long**
-- Clean, mobile-friendly UI
-- Simple Flask backend API
+## 🌐 Live Demo  
+🔗 **URL**: [https://text-sumarization.netlify.app](https://text-sumarization.netlify.app)  
+> Backend deployed on **Render** and frontend on **Netlify**.  
 
-> NOTE: You must have the **Tesseract OCR** system binary installed for image OCR to work.  
-> On Ubuntu: `sudo apt-get install tesseract-ocr`  
-> On macOS (Homebrew): `brew install tesseract`
+## 🔎 Approach  
+The Document Summary Assistant was developed to solve the challenge of extracting key insights from unstructured documents like PDFs and scanned images. The project combines text extraction, natural language processing, and a user-friendly interface to deliver quick, useful summaries. The workflow begins with file upload, where users can provide PDFs or images through a drag-and-drop interface. The backend first checks the file type and applies the appropriate extraction method. For PDFs, the application uses pdfplumber to parse text accurately. For image-based documents, Optical Character Recognition (OCR) is performed using Tesseract (pytesseract in Python) to convert visual text into machine-readable format.
+Once text is extracted, it is split into manageable chunks and sent to the Groq LLM API for analysis. The model generates summaries of different lengths—short, medium, or long—depending on user preference. Additionally, the AI provides improvement suggestions to enhance readability, conciseness, and engagement.
+The frontend, built with HTML, CSS, and JavaScript, presents the results in a clean, responsive design. The backend is deployed on Render using Docker, while the frontend is hosted on Netlify. Together, the system demonstrates problem-solving, clean code practices, and real-world usability within the given assessment constraints.
+## ⚡ Features  
+- 📂 Upload PDFs & images (drag & drop / file picker)  
+- 📑 Text extraction (OCR + PDF parsing)  
+- ✍️ AI Summaries (short / medium / long)  
+- 💡 Improvement Suggestions from AI  
+- 🔒 CORS Handling for local + production  
+- 🎨 Modern UI with responsive design  
 
-## Tech Stack
-- Backend: **Flask**, `pdfplumber`, `pytesseract`, `transformers`, `torch`
-- Frontend: HTML/CSS/JS (no framework)
-- Deploy: Render/Heroku (backend), Netlify/Vercel (frontend)
+## 🗂 Project Structure
+```
+document-summary-assistant/
+├─ backend/
+│ ├─ app.py # Flask backend with API endpoints
+│ ├─ requirements.txt # Python dependencies
+│ ├─ Dockerfile # Dockerfile for containerized deployment
+│ └─ .env.example # Example environment variables
+├─ frontend/
+│ ├─ index.html # Frontend UI
+│ ├─ script.js # Frontend logic (file upload, API calls)
+│ └─ styles.css # Styling for the UI
+```
 
-## Local Development
+## 🛠 Tech Stack  
+- **Backend**: Python, Flask, pdfplumber, pytesseract, Pillow, dotenv, Groq API  
+- **Frontend**: HTML, CSS, JavaScript  
+- **OCR**: Tesseract  
+- **Deployment**: Render (backend), Netlify (frontend)  
+- **Containerization**: Docker  
 
-### 1) Backend
+## 🚀 Getting Started (Local)  
+
+### Clone the repo  
 ```bash
+git clone https://github.com/your-username/document-summary-assistant.git
+cd document-summary-assistant
+```
+### Install Tesseract
+## Ubuntu/Debian
+```bash
+sudo apt-get update && sudo apt-get install -y tesseract-ocr
+```
+### macOS (Homebrew)
+```bash
+brew install tesseract
+```
+## Windows 
+- Download from Tesseract GitHub
+- Add path (e.g. C:\Program Files\Tesseract-OCR\tesseract.exe) to PATH or set in .env.
+## Backend Setup
+``` bash
 cd backend
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+# macOS/Linux
+source .venv/bin/activate
+# Windows
+.venv\Scripts\activate
+
 pip install -r requirements.txt
+cp .env.example .env
+```
+Edit .env with your API keys, then run:
+``` bash
 python app.py
 ```
-The API will run at `http://localhost:8000`.
-
-### 2) Frontend (static)
-Open `frontend/index.html` in a Live Server (VS Code) or any static host.  
-If your backend runs elsewhere, set custom base URL in the browser console:
-```js
-localStorage.setItem("apiBase","https://your-backend.onrender.com")
+## ➡ Backend runs at: http://127.0.0.1:5000
+## Frontend Setup
+- Open frontend/index.html in your browser.
+- In script.js, set API_BASE to your backend URL:
+``` js
+// const API_BASE = "http://127.0.0.1:5000";
+// const API_BASE = "https://your-backend.onrender.com";
 ```
-
-## API
-`POST /api/summarize` multipart form:
-- `file` — the document (PDF or image)
-- `length` — `short|medium|long` (default: `medium`)
-
-Response:
-```json
+## 🧪 API
+POST /api/summarize
+Form-Data
+- files: one or more PDFs or images
+- summary_type: short | medium | long
+## Response Example
+``` json
 {
-  "summary": "...",
-  "key_points": ["..."],
-  "length": "medium",
-  "chars_in": 12345
+  "ok": true,
+  "files": [
+    {
+      "name": "FileName.pdf",
+      "text_preview": "First 500 chars...",
+      "summary_type": "medium",
+      "summary": "• bullet points",
+      "suggestions": "• improvements"
+    }
+  ]
 }
 ```
+## ✍️ Assignment Requirements
 
-## Deploy Tips
-- **Backend**: Use Render/Heroku. Add a `Procfile` (`web: python app.py`). Ensure `tesseract-ocr` is available (Render supports apt packages via render-build scripts; on Heroku, use a buildpack).
-- **Frontend**: Drag-drop `frontend/` to Netlify, or deploy via Vercel (as static). Point it at the backend URL.
+This project fulfills the Document Summary Assistant technical assessment:
 
-## 200-word Approach (example)
-This app extracts text from PDFs with `pdfplumber` and from images via Tesseract OCR. Extracted text is normalized and chunked to keep model input sizes small. We use the Hugging Face Transformers summarization pipeline with DistilBART for quality and speed, with an automatic fallback to T5 on environments where DistilBART cannot load. The server exposes a single `/api/summarize` endpoint that accepts a file and an optional target summary length (short/medium/long). For large documents, the service summarizes page-wise chunks and then summarizes the combined result again to preserve coherence. The frontend is a clean, mobile-friendly HTML/CSS/JS interface with drag-and-drop upload, a length selector, and clear loading states. Errors are handled gracefully (unsupported file types, no text detected, upstream model failures). The solution is intentionally minimal, dependency-light, and easy to deploy: the backend can be hosted on Render or Heroku, and the frontend on Netlify or Vercel. The codebase follows a simple structure, enabling quick review and extension (e.g., adding highlight styles, history, or authentication).
+- ✅ Document Upload (PDFs, images)
 
-## License
-MIT
+- ✅ Text Extraction (PDF parsing + OCR)
+
+- ✅ Summarization (short / medium / long)
+
+- ✅ Improvement Suggestions
+
+- ✅ Clean UI/UX, responsive
+
+- ✅ Hosted on Netlify + Render
+
+- ✅ Code quality + documentation
+
+## 📸Screenshots
+<img width="1919" height="752" alt="image" src="https://github.com/user-attachments/assets/ec0f915f-e903-4bd5-b401-ce5f6dbde801" />
+<img width="1919" height="777" alt="image" src="https://github.com/user-attachments/assets/08fda4a7-cefe-477f-b806-02cc06e993a9" />
+<img width="1011" height="743" alt="image" src="https://github.com/user-attachments/assets/6a3880c5-93a1-4979-a3c8-a07170cd67d5" />
+
+
+## 🙌 Acknowledgements
+
+- Tesseract OCR
+
+- Groq LLM
+
+- pdfplumber
+
+- Pillow
+
+- Flask + CORS
+
+- Docker + Render + Netlify
