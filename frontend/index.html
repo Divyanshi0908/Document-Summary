@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Document Summary Assistant</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Document Summary Assistant</h1>
+      <p>Upload one or more PDFs or images and get an AI-powered summary.</p>
+    </header>
+
+    <section class="uploader">
+      <div id="dropzone" class="dropzone">
+        <p>Drag & drop your files here, or</p>
+        <label for="fileInput" class="button">Choose Files</label>
+        <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg" multiple hidden />
+      </div>
+
+      <div class="controls">
+        <label for="length">Summary length:</label>
+        <select id="length">
+          <option value="short">Short</option>
+          <option value="medium" selected>Medium</option>
+          <option value="long">Long</option>
+        </select>
+        <button id="summarizeBtn" class="button">Summarize</button>
+      </div>
+
+      <div id="loading" class="loading hidden">Summarizing... please wait.</div>
+    </section>
+
+    <section id="result" class="result hidden">
+      <h2>Summaries</h2>
+      <div id="fileSummaries"></div>
+    </section>
+  </main>
+
+  <script src="./script.js"></script>
+</body>
+</html>

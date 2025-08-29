@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: Text-Summarization-backend
+    env: docker
+    plan: free
+    rootDirectory: backend
